@@ -1263,6 +1263,7 @@
 		} catch(e) {
 			// templates not declared 
 		}
+    $(document).trigger('ptree.rebuild', [opts]);
 	};
 
 	ptree.copy_dataset = function(dataset) {

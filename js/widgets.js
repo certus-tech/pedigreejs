@@ -400,11 +400,10 @@
 		    width: ($(window).width() > 400 ? 450 : $(window).width()- 30)
 		});
 
-		var table = "<table id='person_details' class='table'>";
-
-		table += "<tr><td style='text-align:right'>Unique ID</td><td><input class='form-control' type='text' id='id_name' name='name' value="+
-		(d.data.name ? d.data.name : "")+"></td></tr>";
-		table += "<tr><td style='text-align:right'>Name</td><td><input class='form-control' type='text' id='id_display_name' name='display_name' value="+
+		var table = "<input type='hidden' id='id_name' name='name' value="+(d.data.name ? d.data.name : "")+">";
+    table += "<table id='person_details' class='table'>";
+		
+		table += "<tr><td style='text-align:right'>Patient ID</td><td><input class='form-control' type='text' id='id_display_name' name='display_name' value="+
 				(d.data.display_name ? d.data.display_name : "")+"></td></tr>";
 
 		table += "<tr><td style='text-align:right'>Age</td><td><input class='form-control' type='number' id='id_age' min='0' max='120' name='age' style='width:7em' value="+

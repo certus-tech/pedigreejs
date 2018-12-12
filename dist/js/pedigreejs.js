@@ -1146,7 +1146,7 @@
 		
 		// adopted in/out brackets
 		node.append("path")
-			.filter(function (d) {return !d.data.hidden && (d.data.adopted_in || d.data.adopted_out);})
+			.filter(function (d) {return !d.data.hidden && (d.data.adopted_in === true || d.data.adopted_out === true );})
 			.attr("d", function(d) { {			
 				function get_bracket(dx, dy, indent) {
 					return 	"M" + (dx+indent) + "," + dy +
@@ -1240,8 +1240,17 @@
 						return y_offset;
 					},
 					function(d) {
+            var text = '';
 						var dis = disease.replace('_', ' ').replace('cancer', 'ca.');
-						return disease+'_diagnosis_age' in d.data ? dis +": "+ d.data[disease+'_diagnosis_age'] : '';
+            var value = disease+'_diagnosis_age' in d.data ? d.data[disease+'_diagnosis_age'] : null;
+            if (value !== null) {
+              if (value === -1) {
+                text = dis;
+              } else {
+                text = dis +": "+ value;
+              }
+            }
+            return text;
 					}, 'indi_details');
 		}
 
@@ -2336,9 +2345,15 @@
 		else
 			delete person.approx_diagnosis_age;
 
-		$("#person_details select[name*='_diagnosis_age']:visible, #person_details input[type=text]:visible, #person_details input[type=number]:visible").each(function() {
+		$("#person_details select[name*='_diagnosis_age']:visible, #person_details input[type=text]:visible, #person_details input[type=number]:visible, #person_details input[type=checkbox][id$=_diagnosis_age_0]:visible").each(function() {
 			var name = (this.name.indexOf("_diagnosis_age")>-1 ? this.name.substring(0, this.name.length-2): this.name);
-
+      if ($(this).attr('type') === 'checkbox') {
+        if ($(this).is(':checked')) {
+          person[name] = -1;
+        } else {
+          delete person[name];
+        }
+      } else {
 			if($(this).val()) {
 				var val = $(this).val();
 				if(name.indexOf("_diagnosis_age") > -1 && $("#id_approx").is(':checked'))
@@ -2347,7 +2362,7 @@
 			} else {
 				delete person[name];
 			}
-        });
+        }});
 		
 		// cancer checkboxes
 		$('#person_details input[type="checkbox"][name$="cancer"],input[type="checkbox"][name$="cancer2"]').each(function() {
@@ -3216,13 +3231,22 @@
 
 			var disease_colour = '&thinsp;<span style="padding-left:5px;background:'+opts.diseases[k].colour+'"></span>';
 			var diagnosis_age = d.data[v.type + "_diagnosis_age"];
-
-			table += "<tr><td style='text-align:right'>"+capitaliseFirstLetter(v.type.replace("_", " "))+
-						disease_colour+"&nbsp;</td><td>" +
-						"<input class='form-control' id='id_" + 
-						v.type + "_diagnosis_age_0' max='110' min='0' name='" + 
-						v.type + "_diagnosis_age_0' style='width:5em' type='number' value='" +
-						(diagnosis_age !== undefined ? diagnosis_age : "") +"'></td></tr>";
+			// CTA mod: booleans are stored as age -1, this is a quick hack because the codebase is painful to work on atm.
+			var isCheckbox = v.datatype === "boolean";
+			if (isCheckbox) {
+				diagnosis_age = diagnosis_age === undefined ? 0 : diagnosis_age;
+			}
+			table += "<tr><td style='text-align:right'>"+capitaliseFirstLetter(v.type.replace("_", " "))+disease_colour+"&nbsp;</td><td>";
+			table += "<input class='form-control' id='id_" + v.type + "_diagnosis_age_0' name='" + v.type + "_diagnosis_age_0' ";
+			if (isCheckbox) {
+				table += "type='checkbox' value='on' ";
+				if (diagnosis_age === -1) {
+          table += "checked ";
+        }
+      } else {
+        table += "style='width:5em' max='110' min='0' type='number' value='" + (diagnosis_age !== undefined ? diagnosis_age : "") +"' ";
+			}
+			table += "></td></tr>";
 		});
 
 		table += '<tr><td colspan="2" style="line-height:1px;"></td></tr>';

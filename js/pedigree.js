@@ -759,18 +759,13 @@
             var text = '';
 						var dis = disease.replace('_', ' ').replace('cancer', 'ca.');
             var value = disease+'_diagnosis_age' in d.data ? d.data[disease+'_diagnosis_age'] : null;
-            console.group("Begin", d.data['display_name']);
             if (value !== null) {
               if (value === -1) {
-                console.debug("VALUE IS -1", value, typeof value);
                 text = dis;
               } else {
-                console.debug("VALUE IS NOT -1", value, typeof value);
                 text = dis +": "+ value;
               }
             }
-            console.debug("TEXT: ", text);
-            console.groupEnd();
             return text;
 					}, 'indi_details');
 		}

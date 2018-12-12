@@ -451,13 +451,22 @@
 
 			var disease_colour = '&thinsp;<span style="padding-left:5px;background:'+opts.diseases[k].colour+'"></span>';
 			var diagnosis_age = d.data[v.type + "_diagnosis_age"];
-
-			table += "<tr><td style='text-align:right'>"+capitaliseFirstLetter(v.type.replace("_", " "))+
-						disease_colour+"&nbsp;</td><td>" +
-						"<input class='form-control' id='id_" + 
-						v.type + "_diagnosis_age_0' max='110' min='0' name='" + 
-						v.type + "_diagnosis_age_0' style='width:5em' type='number' value='" +
-						(diagnosis_age !== undefined ? diagnosis_age : "") +"'></td></tr>";
+			// CTA mod: booleans are stored as age -1, this is a quick hack because the codebase is painful to work on atm.
+			var isCheckbox = v.datatype === "boolean";
+			if (isCheckbox) {
+				diagnosis_age = diagnosis_age === undefined ? 0 : diagnosis_age;
+			}
+			table += "<tr><td style='text-align:right'>"+capitaliseFirstLetter(v.type.replace("_", " "))+disease_colour+"&nbsp;</td><td>";
+			table += "<input class='form-control' id='id_" + v.type + "_diagnosis_age_0' name='" + v.type + "_diagnosis_age_0' ";
+			if (isCheckbox) {
+				table += "type='checkbox' value='on' ";
+				if (diagnosis_age === -1) {
+          table += "checked ";
+        }
+      } else {
+        table += "style='width:5em' max='110' min='0' type='number' value='" + (diagnosis_age !== undefined ? diagnosis_age : "") +"' ";
+			}
+			table += "></td></tr>";
 		});
 
 		table += '<tr><td colspan="2" style="line-height:1px;"></td></tr>';

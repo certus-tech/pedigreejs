@@ -197,9 +197,15 @@
 		else
 			delete person.approx_diagnosis_age;
 
-		$("#person_details select[name*='_diagnosis_age']:visible, #person_details input[type=text]:visible, #person_details input[type=number]:visible").each(function() {
+		$("#person_details select[name*='_diagnosis_age']:visible, #person_details input[type=text]:visible, #person_details input[type=number]:visible, #person_details input[type=checkbox][id$=_diagnosis_age_0]:visible").each(function() {
 			var name = (this.name.indexOf("_diagnosis_age")>-1 ? this.name.substring(0, this.name.length-2): this.name);
-
+      if ($(this).attr('type') === 'checkbox') {
+        if ($(this).is(':checked')) {
+          person[name] = -1;
+        } else {
+          delete person[name];
+        }
+      } else {
 			if($(this).val()) {
 				var val = $(this).val();
 				if(name.indexOf("_diagnosis_age") > -1 && $("#id_approx").is(':checked'))
@@ -208,7 +214,7 @@
 			} else {
 				delete person[name];
 			}
-        });
+        }});
 		
 		// cancer checkboxes
 		$('#person_details input[type="checkbox"][name$="cancer"],input[type="checkbox"][name$="cancer2"]').each(function() {

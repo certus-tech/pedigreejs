@@ -740,14 +740,20 @@
 		var ancestors2 = pedigree_util.ancestors(opts.dataset, node2);
 		var names1 = $.map(ancestors1, function(ancestor, i){return ancestor.name;});
 		var names2 = $.map(ancestors2, function(ancestor, i){return ancestor.name;});
-  		var consanguity = false;
-  		$.each(names1, function( index, name ) {
-  			if($.inArray(name, names2) !== -1){
-  				consanguity = true;
-  				return false;
-  			}
-  		});
-  		return consanguity;
+		var consanguity = false;
+		$.each(names1, function( index, name ) {
+			if($.inArray(name, names2) !== -1){
+				consanguity = true;
+				return false;
+			}
+		});
+		if (consanguity) { return true; }
+		// Allow a flag on a child to turn on consang. parents too. This allows this to be expressed in a partial pedigree
+		// i.e. where there are not enough generations shown to model consanguity normally.
+		// For some reason getChildren appears to expect the data, not the parent objects themselves.
+		var children = pedigree_util.getChildren(opts.dataset, node1.data, node2.data);
+		consanguity = children.some(function(it) { return it.consanguineous_parents; });
+		return consanguity;
 	}
 
 	// return a flattened representation of the tree
@@ -2314,7 +2320,7 @@
 		}
 
 		// booleans switches
-		var switches = ["miscarriage", "adopted_in", "adopted_out", "termination", "stillbirth"];
+		var switches = ["miscarriage", "adopted_in", "adopted_out", "termination", "stillbirth", "consanguineous_parents"];
 		for(var iswitch=0; iswitch<switches.length; iswitch++){
 			var attr = switches[iswitch];
 			var s = $('#id_'+attr);
@@ -3206,25 +3212,24 @@
 		$("#id_status input[value='"+d.data.status+"']").prop('checked', true);
 
 		// switches
-		var switches = ["adopted_in", "adopted_out", "miscarriage", "stillbirth", "termination"];
-		table += '<tr><td colspan="2"><strong>Reproduction:</strong></td></tr>';
-		table += '<tr><td colspan="2">';
+		var switches = [["adopted_in", "adopted_out"], ["miscarriage", "stillbirth", "termination"], ["consanguineous_parents"]];
+		table += '<tr><td colspan="2"><strong>Reproduction:</strong></td></tr>';		
 		for(var iswitch=0; iswitch<switches.length; iswitch++){
-			var attr = switches[iswitch];
-			if(iswitch === 2)
-				table += '</td></tr><tr><td colspan="2">';
-			table += 
+			table += '<tr><td colspan="2">';
+			switches[iswitch].forEach(function(attr) {
+				table += 
 			 '<label class="checkbox-inline"><input type="checkbox" id="id_'+attr +
 			    '" name="'+attr+'" value="0" '+(d.data[attr] ? "checked" : "")+'>&thinsp;' +
 			    capitaliseFirstLetter(attr.replace('_', ' '))+'</label>'
+			});
+			table += '</td></tr>';
 		}
-		table += '</td></tr>';
 
 		// 
 		var exclude = ["children", "name", "parent_node", "top_level", "id", "noparents",
 			           "level", "age", "sex", "status", "display_name", "mother", "father",
 			           "yob", "mztwin", "dztwin"];
-		$.merge(exclude, switches);
+		$.merge(exclude, switches.flat());
 		table += '<tr><td colspan="2"><strong>Age of Diagnosis:</strong></td></tr>';
 		$.each(opts.diseases, function(k, v) {
 			exclude.push(v.type+"_diagnosis_age");

@@ -256,14 +256,14 @@
 		var ancestors2 = pedigree_util.ancestors(opts.dataset, node2);
 		var names1 = $.map(ancestors1, function(ancestor, i){return ancestor.name;});
 		var names2 = $.map(ancestors2, function(ancestor, i){return ancestor.name;});
-  		var consanguity = false;
-  		$.each(names1, function( index, name ) {
-  			if($.inArray(name, names2) !== -1){
-  				consanguity = true;
-  				return false;
-  			}
-  		});
-  		return consanguity;
+		var consanguity = false;
+		$.each(names1, function( index, name ) {
+			if($.inArray(name, names2) !== -1){
+				consanguity = true;
+				return false;
+			}
+		});
+		return consanguity;
 	}
 
 	// return a flattened representation of the tree

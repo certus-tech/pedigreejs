@@ -740,20 +740,10 @@
 		var ancestors2 = pedigree_util.ancestors(opts.dataset, node2);
 		var names1 = $.map(ancestors1, function(ancestor, i){return ancestor.name;});
 		var names2 = $.map(ancestors2, function(ancestor, i){return ancestor.name;});
-		var consanguity = false;
-		$.each(names1, function( index, name ) {
-			if($.inArray(name, names2) !== -1){
-				consanguity = true;
-				return false;
-			}
-		});
-		if (consanguity) { return true; }
-		// Allow a flag on a child to turn on consang. parents too. This allows this to be expressed in a partial pedigree
-		// i.e. where there are not enough generations shown to model consanguity normally.
-		// For some reason getChildren appears to expect the data, not the parent objects themselves.
-		var children = pedigree_util.getChildren(opts.dataset, node1.data, node2.data);
-		consanguity = children.some(function(it) { return it.consanguineous_parents; });
-		return consanguity;
+		// Detect common ancestor and also allow a flag on a child to turn on consang. parents too. This allows this to be
+		// expressed in a partial pedigree i.e. where there are not enough generations shown to model consanguity normally.
+		return names1.some(function(name) { return names2.indexOf(name) !== -1; }) ||
+			pedigree_util.getChildren(opts.dataset, node1.data, node2.data).some(function(it) { return it.consanguineous_parents; });
 	}
 
 	// return a flattened representation of the tree

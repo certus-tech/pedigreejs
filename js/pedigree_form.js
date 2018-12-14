@@ -166,7 +166,7 @@
 		}
 
 		// booleans switches
-		var switches = ["miscarriage", "adopted_in", "adopted_out", "termination", "stillbirth"];
+		var switches = ["miscarriage", "adopted_in", "adopted_out", "termination", "stillbirth", "consanguineous_parents"];
 		for(var iswitch=0; iswitch<switches.length; iswitch++){
 			var attr = switches[iswitch];
 			var s = $('#id_'+attr);

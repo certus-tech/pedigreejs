@@ -426,25 +426,24 @@
 		$("#id_status input[value='"+d.data.status+"']").prop('checked', true);
 
 		// switches
-		var switches = ["adopted_in", "adopted_out", "miscarriage", "stillbirth", "termination"];
-		table += '<tr><td colspan="2"><strong>Reproduction:</strong></td></tr>';
-		table += '<tr><td colspan="2">';
+		var switches = [["adopted_in", "adopted_out"], ["miscarriage", "stillbirth", "termination"], ["consanguineous_parents"]];
+		table += '<tr><td colspan="2"><strong>Reproduction:</strong></td></tr>';		
 		for(var iswitch=0; iswitch<switches.length; iswitch++){
-			var attr = switches[iswitch];
-			if(iswitch === 2)
-				table += '</td></tr><tr><td colspan="2">';
-			table += 
+			table += '<tr><td colspan="2">';
+			switches[iswitch].forEach(function(attr) {
+				table += 
 			 '<label class="checkbox-inline"><input type="checkbox" id="id_'+attr +
 			    '" name="'+attr+'" value="0" '+(d.data[attr] ? "checked" : "")+'>&thinsp;' +
 			    capitaliseFirstLetter(attr.replace('_', ' '))+'</label>'
+			});
+			table += '</td></tr>';
 		}
-		table += '</td></tr>';
 
 		// 
 		var exclude = ["children", "name", "parent_node", "top_level", "id", "noparents",
 			           "level", "age", "sex", "status", "display_name", "mother", "father",
 			           "yob", "mztwin", "dztwin"];
-		$.merge(exclude, switches);
+		$.merge(exclude, switches.flat());
 		table += '<tr><td colspan="2"><strong>Age of Diagnosis:</strong></td></tr>';
 		$.each(opts.diseases, function(k, v) {
 			exclude.push(v.type+"_diagnosis_age");

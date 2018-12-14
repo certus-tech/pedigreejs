@@ -263,6 +263,12 @@
 				return false;
 			}
 		});
+		if (consanguity) { return true; }
+		// Allow a flag on a child to turn on consang. parents too. This allows this to be expressed in a partial pedigree
+		// i.e. where there are not enough generations shown to model consanguity normally.
+		// For some reason getChildren appears to expect the data, not the parent objects themselves.
+		var children = pedigree_util.getChildren(opts.dataset, node1.data, node2.data);
+		consanguity = children.some(function(it) { return it.consanguineous_parents; });
 		return consanguity;
 	}
 
